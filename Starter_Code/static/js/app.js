@@ -16,19 +16,19 @@ function buildMetadata(sample) {
 
 function buildCharts(sample) {
   // @TODO: Use `d3.json` to fetch the sample data for the plots
-  var plotData = `/samples/${sample}`;
   // @TODO: Build a Bubble Chart using the sample data
   d3.json('samples.json').then(function(data) {
       var xsamples = data.samples
       console.log(data)
-      console.log(xsamples)
-    var x_axis = xsamples.otu_ids;
+      console.log(xsamples)      
+      var x_axis = xsamples.otu_ids;
     var y_axis = xsamples.sample_values;
     var size = xsamples.sample_values;
     var color = xsamples.otu_ids;
     var texts = xsamples.otu_labels;
-  
+      console.log(x_axis)
     var bubble = {
+      type: 'bubble',
       x: x_axis,
       y: y_axis,
       text: texts,
@@ -38,7 +38,7 @@ function buildCharts(sample) {
         color: color,
       }
     };
-
+console.log(bubble)
     var ndata = [bubble];
     var layout = {
       xaxis: {title: "OTU ID"}
@@ -47,10 +47,10 @@ function buildCharts(sample) {
 
     // @TODO: Build a bar chart
     d3.json('samples.json').then(xsamples => {
-      var values = xsamples.sample_values.slice(0,10);
+      var values = xsamples.sample_values;
       var labels = xsamples.otu_ids.slice(0,10);
       var display = xsamples.otu_labels.slice(0,10);
-
+console.log(values)
       var layout = [{
         values: values,
         lables: labels,
@@ -58,7 +58,7 @@ function buildCharts(sample) {
         type: 'bar',
         orientation: 'h'
       }];
-      Plotly.newPlot('bar',data, layout);
+      Plotly.newPlot('bar', data, layout);
     });
   });
 };
