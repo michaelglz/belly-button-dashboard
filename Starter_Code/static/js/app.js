@@ -1,6 +1,6 @@
 function buildMetadata(sample) {
-    d3.json('samples.json').then(data => {
-        var metadata = data.metadata;
+    d3.json('samples.json').then(xdat => {
+        var metadata = xdat.metadata;
 
         var resultArray = metadata.filter(sampleObj => sampleObj.id == sample);
         var result = resultArray[0];
@@ -10,20 +10,23 @@ function buildMetadata(sample) {
         Object.entries(result).forEach(([key,value]) => {
             PANEL.append('h6').text(`${key}: ${value}`);
         });
-        // buildGauge(result.wfreq);
+
     })
 }
 
 function buildCharts(sample) {
   // @TODO: Use `d3.json` to fetch the sample data for the plots
-  var plotData = result;
+  var plotData = `/samples/${sample}`;
   // @TODO: Build a Bubble Chart using the sample data
-  d3.json(plotData).then(function(data){
-    var x_axis = data.otu_ids;
-    var y_axis = data.sample_values;
-    var size = data.sample_values;
-    var color = data.otu_ids;
-    var texts = data.otu_labels;
+  d3.json('samples.json').then(function(data) {
+      var xsamples = data.samples
+      console.log(data)
+      console.log(xsamples)
+    var x_axis = xsamples.otu_ids;
+    var y_axis = xsamples.sample_values;
+    var size = xsamples.sample_values;
+    var color = xsamples.otu_ids;
+    var texts = xsamples.otu_labels;
   
     var bubble = {
       x: x_axis,
@@ -32,30 +35,30 @@ function buildCharts(sample) {
       mode: `markers`,
       marker: {
         size: size,
-        color: color
+        color: color,
       }
     };
 
-    var data = [bubble];
+    var ndata = [bubble];
     var layout = {
-      title: "Belly Button Bacteria",
       xaxis: {title: "OTU ID"}
     };
-    Plotly.newPlot("bubble", data, layout);
+    Plotly.newPlot("bubble", ndata, layout);
 
-    // @TODO: Build a Pie Chart
-    d3.json(plotData).then(function(data){
-      var values = data.sample_values.slice(0,10);
-      var labels = data.otu_ids.slice(0,10);
-      var display = data.otu_labels.slice(0,10);
+    // @TODO: Build a bar chart
+    d3.json('samples.json').then(xsamples => {
+      var values = xsamples.sample_values.slice(0,10);
+      var labels = xsamples.otu_ids.slice(0,10);
+      var display = xsamples.otu_labels.slice(0,10);
 
-      var pie_chart = [{
+      var layout = [{
         values: values,
         lables: labels,
         hovertext: display,
-        type: "pie"
+        type: 'bar',
+        orientation: 'h'
       }];
-      Plotly.newPlot('pie',pie_chart);
+      Plotly.newPlot('bar',data, layout);
     });
   });
 };
@@ -69,8 +72,8 @@ function buildCharts(sample) {
 function init() {
     var selector = d3.select('#selDataset');
 
-    d3.json('samples.json').then(data => {
-        var sampleNames = data.names;
+    d3.json('samples.json').then(xdata => {
+        var sampleNames = xdata.names;
 
         sampleNames.forEach( name => {
             selector
@@ -80,13 +83,13 @@ function init() {
         });
 
         var firstSample = sampleNames[0];
-        // buildCharts(firstSample);
+        buildCharts(firstSample);
         buildMetadata(firstSample);
     });
 };
 
 function optionChanged(newSample) {
-  // buildCharts(newSample);
+  buildCharts(newSample);
   buildMetadata(newSample);
 }
 
